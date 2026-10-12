@@ -17,9 +17,11 @@ import {
 import { supabase } from "../../lib/supabase";
 
 
+
 const API_BASE_URL = (
-  import.meta.env.VITE_EMAIL_API_URL || "http://127.0.0.1:3001"
-).replace(/\/$/, "");
+  import.meta.env.VITE_EMAIL_API_URL ||
+  "https://adnex-media-email-backend.onrender.com"
+).replace(/\/+$/, "");
 
 
 const OFFER_TEMPLATE_ID = "internship-selection-offer";
