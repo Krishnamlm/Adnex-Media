@@ -17,9 +17,12 @@ import {
 
 const SIGNATURE_URL = "/signature.png";
 const TEMPLATE_URL = "/offer-template.png";
+
 const EMAIL_API_URL = (
-  import.meta.env.VITE_EMAIL_API_URL || "http://127.0.0.1:3001"
-).replace(/\/$/, "");
+  import.meta.env.VITE_EMAIL_API_URL ||
+  "https://adnex-media-email-backend.onrender.com"
+).replace(/\/+$/, "");
+
 
 const OFFER_TEMPLATE_ID = "internship-selection-offer";
 const SELECTED_TEMPLATE_KEY = "adnex_selected_email_template_id";
