@@ -597,14 +597,17 @@ function createPlainTextVersion(html) {
 
 /* -------------------- Health check -------------------- */
 
-app.get("/health", (req, res) => {
+
+app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     service: "AdNex Media Email API",
     status: "running",
-    timestamp: new Date().toISOString(),
+    message: "Welcome to the AdNex Media Email API",
+    health: "/health",
   });
 });
+
 
 /* -------------------- Protected email routes -------------------- */
 
