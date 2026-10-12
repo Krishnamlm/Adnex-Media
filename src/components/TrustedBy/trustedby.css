@@ -1,0 +1,382 @@
+/* =========================================
+   TRUSTED BY SECTION
+========================================= */
+
+.trusted-section {
+  width: 100%;
+  padding: 100px 0;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.trusted-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* =========================================
+   HEADING
+========================================= */
+
+.trusted-label {
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+
+  color: #7c3aed;
+}
+
+.trusted-heading {
+  margin: 14px 0 0;
+
+  text-align: center;
+
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.1;
+
+  font-weight: 900;
+  letter-spacing: -0.04em;
+
+  color: #111111;
+}
+
+.trusted-description {
+  margin: 18px auto 0;
+
+  max-width: 600px;
+
+  text-align: center;
+
+  font-size: 16px;
+  line-height: 1.6;
+
+  color: #737373;
+}
+
+
+/* =========================================
+   MARQUEE WRAPPER
+========================================= */
+
+.trusted-marquee-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 55px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================
+   MARQUEE
+========================================= */
+
+.trusted-marquee {
+  width: 100%;
+  overflow: hidden;
+}
+
+
+/* =========================================
+   TRACK
+========================================= */
+
+.trusted-marquee-track {
+  display: flex;
+  align-items: center;
+
+  width: max-content;
+
+  gap: 24px;
+
+  /*
+    The track contains two identical sets.
+    Moving -50% creates the infinite loop.
+  */
+  animation: trusted-scroll 30s linear infinite;
+
+  will-change: transform;
+}
+
+
+/* =========================================
+   RIGHT → LEFT ANIMATION
+========================================= */
+
+@keyframes trusted-scroll {
+
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+
+}
+
+
+/* =========================================
+   COMPANY CARD
+========================================= */
+
+.company-card {
+  width: 190px;
+  min-width: 190px;
+
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #eeeeee;
+
+  border-radius: 16px;
+
+  
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================
+   COMPANY LOGO
+========================================= */
+
+/* =========================================
+   COMPANY LOGO
+========================================= */
+
+.company-card img {
+  display: block;
+
+  max-width: 130px;
+  max-height: 92px;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  opacity: 1;
+
+  /* Keep original logo colors */
+  filter: none;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+
+/* =========================================
+   HOVER
+========================================= */
+
+
+
+/* =========================================
+   LEFT / RIGHT FADE
+========================================= */
+
+.trusted-fade {
+  position: absolute;
+
+  top: 0;
+
+  width: 120px;
+  height: 100%;
+
+  z-index: 10;
+
+  pointer-events: none;
+}
+
+.trusted-fade-left {
+  left: 0;
+
+  background: linear-gradient(
+    to right,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.85) 35%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.trusted-fade-right {
+  right: 0;
+
+  background: linear-gradient(
+    to left,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.85) 35%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+
+/* =========================================
+   HOVER PAUSE
+========================================= */
+
+.trusted-marquee-wrapper:hover
+.trusted-marquee-track {
+  animation-play-state: paused;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1024px) {
+
+  .trusted-section {
+    padding: 80px 0;
+  }
+
+  .trusted-marquee-track {
+    gap: 20px;
+
+    animation-duration: 28s;
+  }
+
+  .company-card {
+    width: 175px;
+    min-width: 175px;
+
+    height: 55px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .trusted-section {
+    padding: 70px 0;
+  }
+
+  .trusted-container {
+    padding: 0 16px;
+  }
+
+  .trusted-label {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+  }
+
+  .trusted-heading {
+    font-size: 32px;
+  }
+
+  .trusted-description {
+    font-size: 14px;
+
+    padding: 0 10px;
+  }
+
+  .trusted-marquee-wrapper {
+    margin-top: 40px;
+  }
+
+  .trusted-marquee-track {
+    gap: 16px;
+
+    animation-duration: 24s;
+  }
+
+  .company-card {
+    width: 150px;
+    min-width: 150px;
+
+    height: 55px;
+
+    padding: 15px 20px;
+
+    border-radius: 13px;
+  }
+
+  .company-card img {
+    max-width: 105px;
+    max-height: 34px;
+  }
+
+  .trusted-fade {
+    width: 60px;
+  }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+  .trusted-section {
+    padding: 60px 0;
+  }
+
+  .trusted-heading {
+    font-size: 28px;
+  }
+
+  .trusted-description {
+    font-size: 13px;
+  }
+
+  .company-card {
+    width: 140px;
+    min-width: 140px;
+
+    height: 50px;
+  }
+
+  .company-card img {
+    max-width: 95px;
+  }
+
+  .trusted-fade {
+    width: 45px;
+  }
+
+}
+
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .trusted-marquee-track {
+    animation: none;
+  }
+
+}

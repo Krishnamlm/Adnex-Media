@@ -1,0 +1,1114 @@
+* {
+  box-sizing: border-box;
+}
+
+.adnex-contact-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(91, 72, 255, 0.13),
+      transparent 35%
+    ),
+    #050711;
+
+  color: #ffffff;
+
+  padding: 100px 40px 90px;
+}
+
+
+/* =========================================
+   BACKGROUND
+========================================= */
+
+.adnex-bg-glow {
+  position: absolute;
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  filter: blur(100px);
+}
+
+.adnex-glow-one {
+  width: 550px;
+  height: 550px;
+
+  top: -280px;
+  left: 10%;
+
+  background: rgba(92, 65, 255, 0.18);
+}
+
+.adnex-glow-two {
+  width: 450px;
+  height: 450px;
+
+  right: -200px;
+  bottom: -200px;
+
+  background: rgba(0, 190, 255, 0.13);
+}
+
+
+/* Large blue/purple arc */
+
+.adnex-orbit {
+  position: absolute;
+
+  width: 1100px;
+  height: 500px;
+
+  left: 50%;
+  top: -340px;
+
+  transform: translateX(-50%);
+
+  border: 1px solid rgba(98, 82, 255, 0.5);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 100px 100px rgba(66, 72, 255, 0.08),
+    0 0 100px rgba(54, 117, 255, 0.14);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
+.adnex-contact-container {
+  position: relative;
+
+  z-index: 2;
+
+  width: min(1180px, 100%);
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(330px, 0.85fr)
+    minmax(550px, 1.15fr);
+
+  gap: 90px;
+
+  align-items: center;
+}
+
+
+/* =========================================
+   LEFT CONTENT
+========================================= */
+
+.adnex-contact-intro {
+  padding: 30px 0;
+}
+
+
+/* Badge */
+
+.adnex-contact-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 8px 13px;
+
+  border-radius: 30px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  color: #c9c7ff;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  margin-bottom: 25px;
+
+  backdrop-filter: blur(10px);
+}
+
+.adnex-contact-badge span {
+  font-size: 14px;
+}
+
+
+/* Heading */
+
+.adnex-contact-intro h1 {
+  margin: 0;
+
+  font-size: clamp(45px, 5vw, 70px);
+
+  line-height: 1.02;
+
+  letter-spacing: -3.5px;
+
+  font-weight: 500;
+}
+
+.adnex-contact-intro h1 span {
+  background:
+    linear-gradient(
+      100deg,
+      #ffffff 5%,
+      #aaa6ff 50%,
+      #5ecbff 100%
+    );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* Intro text */
+
+.adnex-intro-text {
+  max-width: 510px;
+
+  margin: 28px 0 42px;
+
+  color: #9ba1b3;
+
+  font-size: 15px;
+
+  line-height: 1.75;
+}
+
+
+/* =========================================
+   SIDE INFO
+========================================= */
+
+.adnex-side-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+.adnex-info-line {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 14px;
+}
+
+.adnex-info-dot {
+  width: 7px;
+  height: 7px;
+
+  margin-top: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #756cff;
+
+  box-shadow:
+    0 0 12px rgba(117, 108, 255, 0.8);
+}
+
+.adnex-info-line strong {
+  display: block;
+
+  color: #e8e9ef;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  margin-bottom: 3px;
+}
+
+.adnex-info-line p {
+  margin: 0;
+
+  color: #737a8d;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+/* Bottom statement */
+
+.adnex-bottom-note {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 48px;
+
+  color: #858b9d;
+
+  font-size: 11px;
+}
+
+.adnex-pulse {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #48d5b3;
+
+  box-shadow:
+    0 0 12px rgba(72, 213, 179, 0.8);
+}
+
+
+/* =========================================
+   FORM WRAPPER
+========================================= */
+
+.adnex-form-wrapper {
+  position: relative;
+
+  padding: 30px;
+
+  border-radius: 25px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(17, 20, 38, 0.92),
+      rgba(8, 11, 23, 0.94)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow:
+    0 35px 100px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  backdrop-filter: blur(20px);
+}
+
+
+/* Small glow behind card */
+
+.adnex-form-wrapper::before {
+  content: "";
+
+  position: absolute;
+
+  width: 200px;
+  height: 200px;
+
+  right: -80px;
+  top: -80px;
+
+  background: rgba(92, 77, 255, 0.12);
+
+  filter: blur(70px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   FORM HEADER
+========================================= */
+
+.adnex-form-header {
+  position: relative;
+
+  z-index: 2;
+
+  margin-bottom: 24px;
+}
+
+.adnex-form-header > span {
+  color: #7770ff;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  letter-spacing: 1.5px;
+}
+
+.adnex-form-header h2 {
+  margin: 7px 0 5px;
+
+  font-size: 26px;
+
+  letter-spacing: -0.8px;
+
+  font-weight: 500;
+}
+
+.adnex-form-header p {
+  margin: 0;
+
+  color: #777d90;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.adnex-contact-form {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+/* =========================================
+   INQUIRY TABS
+========================================= */
+
+.adnex-inquiry-tabs {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 7px;
+
+  margin-bottom: 20px;
+}
+
+.adnex-inquiry-tabs button {
+  height: 36px;
+
+  border-radius: 9px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: #858b9c;
+
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.adnex-inquiry-tabs button:hover {
+  color: #ffffff;
+
+  border-color: rgba(120, 108, 255, 0.35);
+}
+
+.adnex-inquiry-tabs button.active {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(105, 91, 255, 0.24),
+      rgba(52, 143, 255, 0.12)
+    );
+
+  border-color: rgba(119, 108, 255, 0.55);
+
+  box-shadow:
+    0 0 20px rgba(92, 82, 255, 0.08);
+}
+
+
+/* =========================================
+   FORM GRID
+========================================= */
+
+.adnex-form-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px;
+}
+
+
+/* Field */
+
+.adnex-field {
+  margin-bottom: 15px;
+}
+
+.adnex-field label {
+  display: block;
+
+  margin: 0 0 7px 3px;
+
+  color: #c5c9d4;
+
+  font-size: 10px;
+
+  font-weight: 450;
+}
+
+.adnex-field label span {
+  color: #8178ff;
+}
+
+
+/* Inputs */
+
+.adnex-field input,
+.adnex-field textarea,
+.adnex-select-wrapper select {
+  width: 100%;
+
+  border: 1px solid rgba(255, 255, 255, 0.075);
+
+  background: rgba(3, 7, 18, 0.75);
+
+  color: #ffffff;
+
+  outline: none;
+
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.adnex-field input {
+  height: 43px;
+
+  padding: 0 13px;
+
+  font-size: 11px;
+}
+
+.adnex-field textarea {
+  min-height: 100px;
+
+  resize: vertical;
+
+  padding: 13px;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.adnex-field input::placeholder,
+.adnex-field textarea::placeholder {
+  color: #4e5668;
+}
+
+.adnex-field input:focus,
+.adnex-field textarea:focus,
+.adnex-select-wrapper select:focus {
+  border-color: rgba(110, 101, 255, 0.7);
+
+  background: rgba(7, 11, 25, 0.95);
+
+  box-shadow:
+    0 0 0 3px rgba(104, 93, 255, 0.08);
+}
+
+
+/* =========================================
+   SELECT
+========================================= */
+
+.adnex-select-wrapper {
+  position: relative;
+}
+
+.adnex-select-wrapper select {
+  height: 43px;
+
+  appearance: none;
+
+  padding: 0 35px 0 13px;
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+.adnex-select-wrapper select option {
+  background: #090d1c;
+
+  color: #ffffff;
+}
+
+.adnex-select-wrapper > span {
+  position: absolute;
+
+  right: 13px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #6e7587;
+
+  font-size: 13px;
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   SECURITY
+========================================= */
+
+.adnex-security {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  margin: 2px 0 15px;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.adnex-security-check {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 5px;
+
+  background: rgba(69, 211, 169, 0.12);
+
+  border: 1px solid rgba(69, 211, 169, 0.3);
+
+  color: #52d5b0;
+
+  font-size: 10px;
+}
+
+.adnex-security strong {
+  display: block;
+
+  color: #9da4b4;
+
+  font-size: 9px;
+
+  font-weight: 500;
+}
+
+.adnex-security span {
+  display: block;
+
+  color: #555d70;
+
+  font-size: 8px;
+
+  margin-top: 2px;
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.adnex-submit {
+  width: 100%;
+
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #655cff,
+      #428fff
+    );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 30px rgba(78, 82, 255, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.adnex-submit:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 35px rgba(78, 82, 255, 0.32);
+}
+
+.adnex-submit-arrow {
+  font-size: 17px;
+
+  transition: transform 0.2s ease;
+}
+
+.adnex-submit:hover .adnex-submit-arrow {
+  transform: translateX(4px);
+}
+
+
+/* =========================================
+   PRIVACY
+========================================= */
+
+.adnex-privacy {
+  margin: 12px 0 0;
+
+  text-align: center;
+
+  color: #50586a;
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+
+  .adnex-contact-container {
+    grid-template-columns: 1fr;
+
+    max-width: 700px;
+
+    gap: 45px;
+  }
+
+  .adnex-contact-intro {
+    text-align: center;
+  }
+
+  .adnex-intro-text {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .adnex-side-info {
+    max-width: 500px;
+
+    margin: auto;
+
+    text-align: left;
+  }
+
+  .adnex-bottom-note {
+    justify-content: center;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+  .adnex-contact-page {
+    padding: 70px 16px 60px;
+  }
+
+  .adnex-contact-container {
+    width: 100%;
+
+    gap: 35px;
+  }
+
+  .adnex-contact-intro {
+    padding: 10px 0;
+  }
+
+  .adnex-contact-intro h1 {
+    font-size: 43px;
+
+    letter-spacing: -2.3px;
+  }
+
+  .adnex-intro-text {
+    font-size: 13px;
+
+    line-height: 1.65;
+
+    margin-top: 20px;
+  }
+
+  .adnex-side-info {
+    gap: 18px;
+  }
+
+  .adnex-info-line strong {
+    font-size: 12px;
+  }
+
+  .adnex-info-line p {
+    font-size: 10px;
+  }
+
+  .adnex-form-wrapper {
+    padding: 20px 16px;
+
+    border-radius: 20px;
+  }
+
+  .adnex-form-header h2 {
+    font-size: 23px;
+  }
+
+  .adnex-inquiry-tabs {
+    grid-template-columns: 1fr;
+
+    gap: 6px;
+  }
+
+  .adnex-form-grid {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+  .adnex-field input,
+  .adnex-select-wrapper select {
+    height: 45px;
+  }
+
+  .adnex-orbit {
+    width: 700px;
+
+    height: 350px;
+
+    top: -250px;
+  }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+
+  .adnex-contact-intro h1 {
+    font-size: 37px;
+  }
+
+  .adnex-form-wrapper {
+    padding: 18px 13px;
+  }
+
+  .adnex-contact-badge {
+    font-size: 10px;
+  }
+}
+
+
+
+/* =========================================
+   SUCCESS POPUP OVERLAY
+========================================= */
+
+.adnex-success-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(5, 7, 20, 0.58);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation: adnexOverlayIn 0.25s ease forwards;
+}
+
+
+/* =========================================
+   SUCCESS POPUP
+========================================= */
+
+.adnex-success-popup {
+  position: relative;
+
+  width: min(100%, 470px);
+
+  padding: 42px 38px 32px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(124, 58, 237, 0.12);
+
+  border-radius: 28px;
+
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(124, 58, 237, 0.12),
+      transparent 45%
+    ),
+    #ffffff;
+
+  text-align: center;
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.22),
+    0 10px 30px rgba(91, 33, 182, 0.08);
+
+  animation:
+    adnexPopupIn
+    0.4s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+.adnex-success-popup::before {
+  content: "";
+
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  top: -100px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: rgba(124, 58, 237, 0.12);
+
+  filter: blur(35px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+.adnex-success-close {
+  position: absolute;
+
+  top: 17px;
+  right: 17px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #eeeeee;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #555555;
+
+  font-family: inherit;
+
+  font-size: 25px;
+  font-weight: 300;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.adnex-success-close:hover {
+  background: #111111;
+
+  border-color: #111111;
+
+  color: #ffffff;
+
+  transform: rotate(90deg);
+}
+
+
+/* =========================================
+   SUCCESS ICON
+========================================= */
+
+.adnex-success-icon {
+  position: relative;
+
+  z-index: 1;
+
+  width: 76px;
+  height: 76px;
+
+  margin: 0 auto 23px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(34, 197, 94, 0.18);
+
+  border-radius: 50%;
+
+  background: rgba(34, 197, 94, 0.09);
+
+  color: #16a34a;
+
+  box-shadow:
+    0 0 0 8px rgba(34, 197, 94, 0.035);
+
+  animation:
+    adnexSuccessIcon
+    0.55s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    0.15s
+    both;
+}
+
+.adnex-success-icon svg {
+  width: 43px;
+  height: 43px;
+}
+
+
+/* =========================================
+   SUCCESS CONTENT
+========================================= */
+
+.adnex-success-content {
+  position: relative;
+
+  z-index: 1;
+}
+
+.adnex-success-label {
+  display: inline-block;
+
+  margin-bottom: 9px;
+
+  color: #7c3aed;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+}
+
+.adnex-success-content h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: clamp(28px, 5vw, 38px);
+
+  font-weight: 700;
+
+  line-height: 1.08;
+
+  letter-spacing: -0.04em;
+}
+
+.adnex-success-content h3 span {
+  color: #7c3aed;
+}
+
+.adnex-success-content p {
+  max-width: 370px;
+
+  margin: 17px auto 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+}
+
+.adnex-turnstile-wrapper {
+  width: 100%;
+  margin: 4px 0 8px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 65px;
+}
+
+.adnex-turnstile-wrapper iframe {
+  max-width: 100%;
+}

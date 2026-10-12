@@ -1,0 +1,10 @@
+{
+  "name": "twilight-mode-7f74",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-22",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  }
+}
