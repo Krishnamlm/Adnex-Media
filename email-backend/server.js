@@ -1,6 +1,5 @@
 
 import "dotenv/config";
-import { google } from "googleapis";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -28,13 +27,18 @@ const TEMPLATE_OVERRIDES_FILE = path.join(
 );
 const TEMPLATES_DIR = path.join(__dirname, "templates");
 
-const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID;
-const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;
-const GMAIL_REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
 
-const GMAIL_SENDER_EMAIL = (
-  process.env.GMAIL_SENDER_EMAIL || "adnextechnologies@gmail.com"
+const SMTP_HOST = process.env.SMTP_HOST || "smtp.hostinger.com";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+const SMTP_SECURE =
+  String(process.env.SMTP_SECURE ?? "true").toLowerCase() === "true";
+
+const SMTP_USER = process.env.SMTP_USER || "";
+const SMTP_PASS = process.env.SMTP_PASS || "";
+const MAIL_FROM = (
+  process.env.MAIL_FROM || "support@adnexmedia.in"
 ).trim().toLowerCase();
+
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY =
@@ -140,16 +144,7 @@ const DEFAULT_SETTINGS = {
   defaultTemplateId: "internship-selection-offer",
 };
 
-if (
-  !GMAIL_CLIENT_ID ||
-  !GMAIL_CLIENT_SECRET ||
-  !GMAIL_REFRESH_TOKEN ||
-  !GMAIL_SENDER_EMAIL
-) {
-  console.warn(
-    "WARNING: Gmail API OAuth environment variables are incomplete."
-  );
-}
+
 
 if (!supabase) {
   console.warn("WARNING: Supabase environment variables are missing.");
@@ -313,77 +308,44 @@ async function writeTemplateOverrides(overrides) {
   );
 }
 
-/* -------------------- SMTP -------------------- */
 
+/* -------------------- Hostinger SMTP -------------------- */
 
-/* -------------------- Gmail API over HTTPS -------------------- */
-
-// Build MIME emails locally; no SMTP connection is used.
-const mimeTransport = nodemailer.createTransport({
-  streamTransport: true,
-  buffer: true,
-  newline: "unix",
-});
-
-function getConfiguredGmailClient() {
-  const missing = [];
-
-  if (!GMAIL_CLIENT_ID) missing.push("GMAIL_CLIENT_ID");
-  if (!GMAIL_CLIENT_SECRET) missing.push("GMAIL_CLIENT_SECRET");
-  if (!GMAIL_REFRESH_TOKEN) missing.push("GMAIL_REFRESH_TOKEN");
-  if (!GMAIL_SENDER_EMAIL) missing.push("GMAIL_SENDER_EMAIL");
-
-  if (missing.length) {
+function getSmtpTransport() {
+  if (!SMTP_USER || !SMTP_PASS) {
     const error = new Error(
-      `Missing Gmail API environment variables: ${missing.join(", ")}`
+      "Hostinger SMTP credentials are not configured."
     );
-    error.code = "GMAIL_API_CONFIGURATION_ERROR";
+    error.code = "SMTP_CONFIGURATION_ERROR";
     throw error;
   }
 
-  const auth = new google.auth.OAuth2(
-    GMAIL_CLIENT_ID,
-    GMAIL_CLIENT_SECRET
-  );
-
-  auth.setCredentials({
-    refresh_token: GMAIL_REFRESH_TOKEN,
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS,
+    },
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
   });
-
-  return google.gmail({ version: "v1", auth });
 }
 
-async function sendViaGmailApi(mailOptions) {
-  const gmail = getConfiguredGmailClient();
+async function sendViaSmtp(mailOptions) {
+  const transporter = getSmtpTransport();
 
-  const prepared = await mimeTransport.sendMail({
+  return transporter.sendMail({
     ...mailOptions,
     from: {
       name: mailOptions.from?.name || "AdNex Media",
-      address: GMAIL_SENDER_EMAIL,
+      address: MAIL_FROM,
     },
   });
-
-  if (!prepared.message) {
-    throw new Error("Could not construct the email MIME message.");
-  }
-
-  const raw = Buffer.from(prepared.message)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-
-  const response = await gmail.users.messages.send({
-    userId: "me",
-    requestBody: { raw },
-  });
-
-  return {
-    messageId: response.data.id,
-    threadId: response.data.threadId,
-  };
 }
+
 
 
 /* -------------------- Admin authentication -------------------- */
@@ -968,7 +930,7 @@ app.post(
       const mailOptions = {
   from: {
     name: "AdNex Media",
-    address: GMAIL_SENDER_EMAIL,
+    address: MAIL_FROM,
   },
   to: recipient,
   subject,
@@ -989,7 +951,7 @@ app.post(
 }
 
 // This line is already present — keep it here.
-const info = await sendViaGmailApi(mailOptions);
+const info = await sendViaSmtp(mailOptions);
 
 console.info("Email sent successfully:", {
   recipient,
@@ -1015,15 +977,19 @@ console.info("Email sent successfully:", {
         error?.response?.status || error?.status || 0
       );
 
-      console.error("Email send error:", {
-        message,
-        code,
-        status,
-        templateId:
-          typeof req.body?.templateId === "string"
-            ? req.body.templateId
-            : "not provided",
-      });
+      
+console.error("Email send error:", {
+  message,
+  code,
+  status,
+  smtpCommand: error?.command,
+  smtpResponseCode: error?.responseCode,
+  templateId:
+    typeof req.body?.templateId === "string"
+      ? req.body.templateId
+      : "not provided",
+});
+
 
       if (message.startsWith("Template file not found:")) {
         return res.status(500).json({
@@ -1033,14 +999,14 @@ console.info("Email sent successfully:", {
         });
       }
 
-      if (code === "GMAIL_API_CONFIGURATION_ERROR") {
-        return res.status(500).json({
-          success: false,
-          code: "GMAIL_API_CONFIGURATION_ERROR",
-          message:
-            "Gmail API OAuth configuration is incomplete. Check backend environment variables.",
-        });
-      }
+      if (code === "SMTP_CONFIGURATION_ERROR") {
+  return res.status(500).json({
+    success: false,
+    code: "SMTP_CONFIGURATION_ERROR",
+    message:
+      "Hostinger SMTP credentials are missing. Check the backend environment variables.",
+  });
+}
 
       const isValidationError =
         message.startsWith("Missing required template value:") ||
@@ -1048,17 +1014,28 @@ console.info("Email sent successfully:", {
         message.includes("valid CERTIFICATE_URL") ||
         message.includes("valid OFFER_LETTER_URL");
 
-      if (
-        status === 401 ||
-        status === 403 ||
-        status === 429 ||
-        status >= 500
-      ) {
+      const smtpFailureCodes = new Set([
+  "EAUTH",
+  "ECONNECTION",
+  "ETIMEDOUT",
+  "ESOCKET",
+  "EDNS",
+  "ECONNREFUSED",
+  "EENVELOPE",
+]);
+
+if (
+  smtpFailureCodes.has(code) ||
+  status === 401 ||
+  status === 403 ||
+  status === 429 ||
+  status >= 500
+) {
         return res.status(502).json({
           success: false,
-          code: "GMAIL_API_SEND_FAILED",
-          message:
-            "Gmail API could not send the email. Check OAuth authorization, permissions, quotas, and backend logs.",
+          code: "SMTP_SEND_FAILED",
+message:
+  "Hostinger SMTP could not send the email. Check the backend logs and SMTP settings.",
         });
       }
 
@@ -1083,64 +1060,63 @@ console.info("Email sent successfully:", {
 
 /* POST /api/email/test */
 
+
 app.post("/api/email/test", async (req, res) => {
   try {
-    const info = await sendViaGmailApi({
+    const info = await sendViaSmtp({
       from: {
-        name: "AdNex Media HR",
-        address: GMAIL_SENDER_EMAIL,
+        name: "AdNex Media",
+        address: MAIL_FROM,
       },
       to: req.admin.email,
-      subject: "AdNex Media Gmail API Test",
+      subject: "AdNex Media Hostinger SMTP Test",
       text:
-        "Your AdNex Media email backend can send email through the Gmail API.",
+        "Your AdNex Media email backend can send email through Hostinger SMTP.",
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6">
           <h2>AdNex Media Email Test</h2>
-          <p>Your Gmail API integration is working.</p>
+          <p>Your Hostinger SMTP integration is working.</p>
         </div>
       `,
     });
 
-    console.info("Gmail API test email accepted:", {
+    console.info("Hostinger SMTP test email accepted:", {
       recipient: req.admin.email,
       messageId: info.messageId,
     });
 
     return res.json({
       success: true,
-      message: "Gmail API test email sent successfully.",
+      message: "Hostinger SMTP test email sent successfully.",
       messageId: info.messageId,
       recipient: req.admin.email,
     });
   } catch (error) {
-    const status = Number(
-      error?.response?.status || error?.status || 0
-    );
-
-    console.error("Gmail API test failed:", {
+    console.error("Hostinger SMTP test failed:", {
       message: String(error?.message || "Unknown error"),
       code: error?.code,
-      status,
+      command: error?.command,
+      responseCode: error?.responseCode,
     });
 
-    if (error?.code === "GMAIL_API_CONFIGURATION_ERROR") {
+    if (error?.code === "SMTP_CONFIGURATION_ERROR") {
       return res.status(500).json({
         success: false,
-        code: "GMAIL_API_CONFIGURATION_ERROR",
+        code: "SMTP_CONFIGURATION_ERROR",
         message:
-          "Gmail API OAuth environment variables are missing or incomplete.",
+          "Hostinger SMTP credentials are missing. Check the backend environment variables.",
       });
     }
 
     return res.status(502).json({
       success: false,
-      code: "GMAIL_API_TEST_FAILED",
+      code: "SMTP_TEST_FAILED",
       message:
-        "Gmail API test failed. Check OAuth authorization and backend logs.",
+        "Hostinger SMTP test failed. Check the backend logs and SMTP settings.",
     });
   }
 });
+
 
 
 /* -------------------- Error handling -------------------- */
@@ -1189,8 +1165,8 @@ async function startServer() {
   app.listen(PORT, "0.0.0.0", () => {
     console.info(`AdNex Media Email API listening on port ${PORT}`);
     console.info(`Health: http://127.0.0.1:${PORT}/health`);
-    console.info("Email delivery: Gmail API over HTTPS");
-console.info(`Sender: ${GMAIL_SENDER_EMAIL}`);
+    console.info("Email delivery: Hostinger SMTP");
+console.info(`Sender: ${MAIL_FROM}`);
   });
 }
 

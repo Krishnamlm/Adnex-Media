@@ -18,10 +18,12 @@ import { supabase } from "../../lib/supabase";
 
 
 
+
 const API_BASE_URL = (
   import.meta.env.VITE_EMAIL_API_URL ||
   "https://adnex-media-email-backend.onrender.com"
 ).replace(/\/+$/, "");
+
 
 
 const OFFER_TEMPLATE_ID = "internship-selection-offer";
@@ -100,79 +102,96 @@ const hasEditorChanges = Boolean(
     return html;
   }, [editorBody]);
 
-  async function apiRequest(path, options = {}) {
-    async function getAccessToken(forceRefresh = false) {
-      if (forceRefresh) {
-        const {
-          data: { session },
-          error: refreshError,
-        } = await supabase.auth.refreshSession();
 
-        if (refreshError) throw refreshError;
+async function apiRequest(path, options = {}) {
+  async function getAccessToken(forceRefresh = false) {
+    const { data, error: authError } = forceRefresh
+      ? await supabase.auth.refreshSession()
+      : await supabase.auth.getSession();
 
-        if (!session?.access_token) {
-          throw new Error("Session expired. Please sign in again.");
-        }
-
-        return session.access_token;
-      }
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) throw sessionError;
-
-      if (!session?.access_token) {
-        throw new Error(
-          "No active admin session. Please sign in again."
-        );
-      }
-
-      return session.access_token;
+    if (authError) {
+      throw new Error(
+        `Supabase authentication error: ${authError.message}`
+      );
     }
 
-    async function sendRequest(token) {
-      const headers = new Headers(options.headers || {});
+    const session = data?.session;
 
-      headers.set("Authorization", `Bearer ${token}`);
-
-      if (options.body && !(options.body instanceof FormData)) {
-        headers.set("Content-Type", "application/json");
-      }
-
-      return fetch(`${API_BASE_URL}${path}`, {
-        ...options,
-        headers,
-        credentials: "omit",
-      });
+    if (!session?.access_token) {
+      throw new Error(
+        forceRefresh
+          ? "Your session has expired. Please sign in again."
+          : "No active admin session. Please sign in again."
+      );
     }
 
+    return session.access_token;
+  }
+
+  async function sendRequest(token) {
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", `Bearer ${token}`);
+
+    if (options.body && !(options.body instanceof FormData)) {
+      headers.set("Content-Type", "application/json");
+    }
+
+    // Network errors are handled by the outer try/catch.
+    return fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: "omit",
+    });
+  }
+
+  let response;
+
+  try {
     let token = await getAccessToken();
-    let response = await sendRequest(token);
+    response = await sendRequest(token);
 
+    // Refresh the Supabase session once if the API rejects the token.
     if (response.status === 401) {
       token = await getAccessToken(true);
       response = await sendRequest(token);
     }
+  } catch (error) {
+    console.error("Email API network/authentication error:", error);
 
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      console.error("Email API request failed:", {
-        path,
-        status: response.status,
-        message: data.message,
-      });
-
-      throw new Error(
-        data.message || `Request failed (${response.status}).`
-      );
-    }
-
-    return data;
+    throw new Error(
+      error?.message ||
+        "Unable to connect to the email backend. Please try again."
+    );
   }
+
+  const responseText = await response.text();
+  let data = {};
+
+  if (responseText) {
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { message: responseText.slice(0, 300) };
+    }
+  }
+
+  if (!response.ok) {
+    console.error("Email API request failed:", {
+      url: `${API_BASE_URL}${path}`,
+      status: response.status,
+      response: data,
+    });
+
+    throw new Error(
+      data.message ||
+        data.error ||
+        `Email API request failed with HTTP ${response.status}.`
+    );
+  }
+
+  return data;
+}
+
 
   function applySelectedTemplate(template) {
     if (!template) return;
@@ -192,11 +211,17 @@ async function loadTemplates() {
   setError("");
   setNotice("");
 
-  try {
-    const [templateResult, settingsResult] = await Promise.all([
-      apiRequest("/api/email/templates"),
-      apiRequest("/api/email/settings"),
-    ]);
+  
+try {
+  const [templateResult, settingsResult] = await Promise.all([
+    apiRequest("/api/email/templates").catch((err) => {
+      throw new Error(`Loading templates failed: ${err.message}`);
+    }),
+    apiRequest("/api/email/settings").catch((err) => {
+      throw new Error(`Loading settings failed: ${err.message}`);
+    }),
+  ]);
+
 
     const loadedTemplates = templateResult.templates || [];
     const settings = settingsResult.settings || settingsResult;

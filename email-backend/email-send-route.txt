@@ -1,0 +1,225 @@
+/* POST /api/email/send
+   Accepts JSON or multipart/form-data.
+   Offer emails require one personalized PDF attachment. */
+
+app.post(
+  "/api/email/send",
+  emailSendLimiter,
+  (req, res, next) => {
+    const contentType = req.headers["content-type"] || "";
+
+    if (contentType.includes("multipart/form-data")) {
+      return upload.single("attachment")(req, res, next);
+    }
+
+    return next();
+  },
+  async (req, res) => {
+    try {
+      const recipient =
+        typeof req.body?.recipient === "string"
+          ? req.body.recipient.trim()
+          : "";
+
+      const templateId =
+        typeof req.body?.templateId === "string"
+          ? req.body.templateId.trim()
+          : "";
+
+      if (!isValidEmail(recipient)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a valid recipient email address.",
+        });
+      }
+
+      const templateDefinition = findTemplate(templateId);
+
+      if (!templateDefinition) {
+        return res.status(400).json({
+          success: false,
+          message: "The selected email template does not exist.",
+        });
+      }
+
+      const template = await getTemplate(templateDefinition);
+
+      const suppliedVariables =
+        req.body?.variables &&
+        typeof req.body.variables === "object" &&
+        !Array.isArray(req.body.variables)
+          ? req.body.variables
+          : {};
+
+      const variables = {};
+
+      for (const key of template.placeholders) {
+        const value =
+          suppliedVariables[key] ??
+          req.body?.[key] ??
+          suppliedVariables[key.toLowerCase()];
+
+        variables[key] =
+          typeof value === "string" ? value.trim() : value;
+      }
+
+      const isOfferEmail =
+        templateId === "internship-selection-offer";
+
+      if (isOfferEmail && !req.file) {
+        return res.status(400).json({
+          success: false,
+          code: "OFFER_PDF_REQUIRED",
+          message:
+            "Attach the student's personalized offer letter PDF.",
+        });
+      }
+
+      if (!isOfferEmail && req.file) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "PDF attachments are only accepted for the internship selection offer template.",
+        });
+      }
+
+      const renderedHtml = renderEmailTemplate(
+        template.body,
+        variables
+      );
+
+      if (/\{\{[^{}]+\}\}/.test(renderedHtml)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "The selected template contains unresolved placeholders.",
+        });
+      }
+
+      const requestedSubject = normalizeSubject(req.body?.subject);
+      const subject = requestedSubject || template.subject;
+
+      if (!subject) {
+        return res.status(400).json({
+          success: false,
+          message: "The email subject is empty.",
+        });
+      }
+
+      const mailOptions = {
+        from: {
+          name: "AdNex Media",
+          address: SMTP_USER,
+        },
+        to: recipient,
+        subject,
+        text: createPlainTextVersion(renderedHtml),
+        html: renderedHtml,
+      };
+
+      if (isOfferEmail) {
+        mailOptions.attachments = [
+          {
+            filename: path.basename(
+              req.file.originalname || "offer-letter.pdf"
+            ),
+            content: req.file.buffer,
+            contentType: "application/pdf",
+          },
+        ];
+      }
+
+      const transporter = getConfiguredTransporter();
+      const info = await transporter.sendMail(mailOptions);
+
+      console.info("Email sent successfully:", {
+        recipient,
+        templateId,
+        admin: req.admin.email,
+        messageId: info.messageId,
+        attachmentIncluded: isOfferEmail,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Designed HTML email sent successfully.",
+        messageId: info.messageId,
+        recipient,
+        templateId,
+        attachmentIncluded: isOfferEmail,
+      });
+        
+} catch (error) {
+  const message = String(error?.message || "Unknown error");
+  const code = String(error?.code || "");
+
+  console.error("Email send error:", {
+    message,
+    code,
+    command: error?.command,
+    responseCode: error?.responseCode,
+    response: error?.response,
+    templateId:
+      typeof req.body?.templateId === "string"
+        ? req.body.templateId
+        : "not provided",
+  });
+
+  const isValidationError =
+    message.startsWith("Missing required template value:") ||
+    message.includes("must use HTTPS") ||
+    message.includes("valid CERTIFICATE_URL") ||
+    message.includes("valid OFFER_LETTER_URL");
+
+  if (message.includes("SMTP_PASS is missing")) {
+    return res.status(500).json({
+      success: false,
+      code: "SMTP_CONFIGURATION_ERROR",
+      message: "SMTP_PASS is missing from the backend environment.",
+    });
+  }
+
+  if (message.startsWith("Template file not found:")) {
+    return res.status(500).json({
+      success: false,
+      code: "EMAIL_TEMPLATE_MISSING",
+      message,
+    });
+  }
+
+
+if (code === "EAUTH") {
+  return res.status(502).json({
+    success: false,
+    code: "SMTP_AUTH_FAILED",
+    message:
+      "Gmail rejected SMTP authentication. Check SMTP_USER and your Gmail App Password.",
+  });
+}
+
+if (
+  ["ECONNECTION", "ETIMEDOUT", "ESOCKET", "ECONNREFUSED"].includes(code)
+) {
+  return res.status(502).json({
+    success: false,
+    code: "SMTP_CONNECTION_FAILED",
+    message:
+      "Could not connect to Gmail SMTP. Check smtp.gmail.com, port 465, and TLS settings.",
+  });
+}
+
+
+  return res.status(isValidationError ? 400 : 500).json({
+    success: false,
+    code: isValidationError ? "EMAIL_VALIDATION_ERROR" : "EMAIL_SEND_FAILED",
+    message: isValidationError
+      ? message
+      : "Email sending failed. Check the backend logs for the exact error.",
+  });
+}
+
+  }
+);
+
+/* POST /api/email/test */
+
